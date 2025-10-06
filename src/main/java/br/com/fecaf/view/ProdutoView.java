@@ -29,11 +29,6 @@ public class ProdutoView {
 
         // aplicando estilização
         layout.getStyleClass().add("body");
-
-        // conecta controller
-//        btnEnviar.setOnAction(e -> {
-//            controller.enviarPedido(txtCliente.getText(), txtProduto.getText());
-//        });
     }
 
     // getter para o app lançar o layout

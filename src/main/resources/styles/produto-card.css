@@ -1,0 +1,53 @@
+/* produto-card.css */
+.product-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0.5, 0, 4);
+    -fx-alignment: center;
+    -fx-padding: 24;
+    -fx-cursor: hand;
+}
+
+/* Hover */
+.product-card:hover {
+    -fx-translate-y: -5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 25, 0.5, 0, 8);
+}
+
+/* Imagem */
+.product-card .image-view {
+    -fx-background-radius: 4;
+    -fx-padding: 0 0 16 0;
+}
+
+/* Nome do produto */
+.product-card .label {
+    -fx-font-size: 25;
+    -fx-font-weight: 600;
+    -fx-padding: 0 0 8 0;
+}
+
+/* Preço */
+.product-card .price {
+    -fx-font-size: 25;
+    -fx-font-weight: 400;
+    -fx-text-fill: #666666;
+    -fx-padding: 0 0 16 0;
+}
+
+/* Botão */
+.product-card .button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 8 16;
+    -fx-font-size: 14;
+    -fx-font-weight: 400;
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+/* Hover do botão */
+.product-card .button:hover {
+    -fx-background-color: #2980b9;
+}
