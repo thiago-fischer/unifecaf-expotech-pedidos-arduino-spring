@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa Loja</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Nossos Produtos</h1>
+    </header>
+
+    <main id="product-list" class="container">
+        <div class="product-card" data-product-id="1">
+            <img src="/img/7_product-mockup.jpg" alt="Produto 1">
+            <h2>Produto Moderno 1</h2>
+            <p class="price">R$ 199,90</p>
+            <button class="view-details-btn">Ver Detalhes</button>
+        </div>
+
+        <div class="product-card" data-product-id="2">
+            <img src="/img/30_product-mockups.jpg" alt="Produto 2">
+            <h2>Produto Elegante 2</h2>
+            <p class="price">R$ 249,90</p>
+            <button class="view-details-btn">Ver Detalhes</button>
+        </div>
+
+        <div class="product-card" data-product-id="3">
+            <img src="/img/skin-products-arrangement-wooden-blocks_23-2148761445.jpg" alt="Produto 3">
+            <h2>Produto Minimalista 3</h2>
+            <p class="price">R$ 149,90</p>
+            <button class="view-details-btn">Ver Detalhes</button>
+        </div>
+    </main>
+
+    <section id="product-details" class="container hidden">
+        <div class="details-content">
+            <img  id="product-image" src="/img/30_product-mockups.jpg" alt="Produto Detalhe">
+            <div class="product-info">
+                <h2 id="product-title">Nome do Produto</h2>
+                <p id="product-description">Aqui vai uma descrição detalhada e interessante sobre o produto, destacando suas principais qualidades e características.</p>
+                <p id="product-price" class="price">R$ 0,00</p>
+                <button id="send-btn">Fazer Envio</button>
+                <button id="back-btn">Voltar para a Loja</button>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>
