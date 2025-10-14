@@ -16,10 +16,15 @@ public class PedidoController {
         //Conexão com a porta serial
         System.out.println("Número recebido: " + numero);
 
-        if (arduino.abrirPorta("COM3", 9600)) {
-//            arduino.enviarMensagem(String.valueOf(numero));
-            arduino.fecharPorta();
+        try {
+            if (arduino.abrirPorta("COM3", 9600)) {
+                arduino.enviarMensagem(String.valueOf(numero));
+                arduino.fecharPorta();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
+
 
         //Retornar a quantidades de chamadas de separação
         numPedido++;

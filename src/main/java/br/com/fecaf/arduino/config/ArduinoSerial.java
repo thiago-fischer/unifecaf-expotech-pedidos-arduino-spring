@@ -10,6 +10,7 @@ public class ArduinoSerial {
     public boolean abrirPorta(String nomePorta, int baudRate) {
         portaSerial = SerialPort.getCommPort(nomePorta);
         portaSerial.setBaudRate(baudRate);
+        portaSerial.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
 
         if (portaSerial.openPort()) {
             System.out.println("Porta " + nomePorta + " aberta com sucesso!");
