@@ -1,5 +1,6 @@
 package br.com.fecaf.arduino.controller;
 
+import br.com.fecaf.arduino.config.ArduinoSerial;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -7,12 +8,18 @@ import org.springframework.web.bind.annotation.*;
 public class PedidoController {
 
     private int numPedido = 0;
+    private ArduinoSerial arduino = new ArduinoSerial();
 
     @GetMapping(value = "/{numero}")
     public int separarPedido(@PathVariable("numero") int numero) {
 
-        //Implementar as chamadas da lógica de separação do braço robótico aqui
+        //Conexão com a porta serial
         System.out.println("Número recebido: " + numero);
+
+        if (arduino.abrirPorta("COM3", 9600)) {
+//            arduino.enviarMensagem(String.valueOf(numero));
+            arduino.fecharPorta();
+        }
 
         //Retornar a quantidades de chamadas de separação
         numPedido++;
