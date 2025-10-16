@@ -1,55 +1,59 @@
 package br.com.fecaf.arduino.config;
 
 import com.fazecast.jSerialComm.SerialPort;
+import org.springframework.stereotype.Component;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
+@Component // Anotação para o Spring gerenciar esta classe
 public class ArduinoSerial {
 
     private SerialPort portaSerial;
+    private final String NOME_PORTA = "COM5";
+    private final int BAUD_RATE = 9600;
 
-    // Abre a porta
-    public boolean abrirPorta(String nomePorta, int baudRate) {
-        portaSerial = SerialPort.getCommPort(nomePorta);
-        portaSerial.setBaudRate(baudRate);
+    @PostConstruct
+    public void iniciar() {
+        portaSerial = SerialPort.getCommPort(NOME_PORTA);
+        portaSerial.setBaudRate(BAUD_RATE);
         portaSerial.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
 
         if (portaSerial.openPort()) {
-            System.out.println("Porta " + nomePorta + " aberta com sucesso!");
+            System.out.println("Porta " + NOME_PORTA + " aberta com sucesso!");
+            // É crucial esperar o Arduino reiniciar após abrir a porta
             try {
-                Thread.sleep(1000); // tempo para o Arduino iniciar
+                Thread.sleep(2000); // Aumente este tempo se necessário
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                System.err.println("Erro ao esperar pela inicialização do Arduino.");
             }
-            return true;
         } else {
-            System.out.println("Não foi possível abrir a porta " + nomePorta);
-            return false;
+            System.err.println("Não foi possível abrir a porta " + NOME_PORTA);
+            // Você pode querer lançar uma exceção aqui para impedir a aplicação de iniciar
         }
     }
 
     // Envia uma mensagem
     public void enviarMensagem(String mensagem) {
-
-        mensagem = mensagem + "/n";
-
         if (portaSerial != null && portaSerial.isOpen()) {
             try {
-                portaSerial.getOutputStream().write(mensagem.getBytes());
+                String mensagemComQuebraDeLinha = mensagem + "\n";
+                portaSerial.getOutputStream().write(mensagemComQuebraDeLinha.getBytes());
                 portaSerial.getOutputStream().flush();
-                System.out.println("Enviado: " + mensagem.trim());
+                System.out.println("Enviado para o Arduino: " + mensagem);
             } catch (Exception e) {
-                System.out.println("Erro ao enviar mensagem: " + e.getMessage());
+                System.err.println("Erro ao enviar mensagem: " + e.getMessage());
             }
         } else {
-            System.out.println("Porta não está aberta.");
+            System.err.println("A porta serial não está aberta para enviar a mensagem.");
         }
     }
 
-    // Fecha a porta
+    @PreDestroy
     public void fecharPorta() {
         if (portaSerial != null && portaSerial.isOpen()) {
             portaSerial.closePort();
-            System.out.println("Porta fechada.");
+            System.out.println("Porta " + NOME_PORTA + " fechada.");
         }
     }
 }
-

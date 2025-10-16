@@ -1,6 +1,7 @@
 package br.com.fecaf.arduino.controller;
 
 import br.com.fecaf.arduino.config.ArduinoSerial;
+import org.springframework.beans.factory.annotation.Autowired; // Importe o Autowired
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -8,27 +9,22 @@ import org.springframework.web.bind.annotation.*;
 public class PedidoController {
 
     private int numPedido = 0;
-    private ArduinoSerial arduino = new ArduinoSerial();
+
+    @Autowired
+    private ArduinoSerial arduino;
 
     @GetMapping(value = "/{numero}")
     public int separarPedido(@PathVariable("numero") int numero) {
 
-        //Conexão com a porta serial
-        System.out.println("Número recebido: " + numero);
+        System.out.println("Número recebido pela API: " + numero);
 
-        try {
-            if (arduino.abrirPorta("COM3", 9600)) {
-                arduino.enviarMensagem(String.valueOf(numero));
-                arduino.fecharPorta();
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        // Agora não precisamos mais abrir e fechar a porta aqui
+        // Apenas enviamos a mensagem
+        arduino.enviarMensagem(String.valueOf(numero));
 
-
-        //Retornar a quantidades de chamadas de separação
+        // Retornar a quantidades de chamadas de separação
         numPedido++;
+        System.out.println("Este é o pedido de número: " + numPedido);
         return numPedido;
     }
-
 }
