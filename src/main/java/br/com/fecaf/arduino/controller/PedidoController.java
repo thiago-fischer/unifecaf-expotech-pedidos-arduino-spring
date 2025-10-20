@@ -1,8 +1,11 @@
 package br.com.fecaf.arduino.controller;
 
 import br.com.fecaf.arduino.config.ArduinoSerial;
-import org.springframework.beans.factory.annotation.Autowired; // Importe o Autowired
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/pedido")
@@ -18,8 +21,7 @@ public class PedidoController {
 
         System.out.println("Número recebido pela API: " + numero);
 
-        // Agora não precisamos mais abrir e fechar a porta aqui
-        // Apenas enviamos a mensagem
+        // Enviar a mensagem para o Arduino
         arduino.enviarMensagem(String.valueOf(numero));
 
         // Retornar a quantidades de chamadas de separação

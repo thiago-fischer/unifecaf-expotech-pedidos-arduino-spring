@@ -4,37 +4,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const productDetails = document.getElementById('product-details');
     const backBtn = document.getElementById('back-btn');
     const sendBtn = document.getElementById('send-btn');
+    let products = [];
 
-    // 🔹 variável global para armazenar o ID do produto selecionado
-    let numeroPedido = null;
+    // Carregar as informações dos produtos do banco de dados
+    async function carregarProdutos(){
+        const resposta = await fetch("http://localhost:8080/produtos");
 
-    const products = {
-        '1': {
-            name: 'Produto Moderno 1',
-            price: 'R$ 199,90',
-            description: 'Uma descrição detalhada sobre o Produto Moderno 1...',
-            image: '/img/7_product-mockup.jpg'
-        },
-        '2': {
-            name: 'Produto Elegante 2',
-            price: 'R$ 249,90',
-            description: 'O Produto Elegante 2 combina funcionalidade...',
-            image: '/img/30_product-mockups.jpg'
-        },
-        '3': {
-            name: 'Produto Minimalista 3',
-            price: 'R$ 149,90',
-            description: 'Com um design limpo e focado no essencial...',
-            image: '/img/skin-products-arrangement-wooden-blocks_23-2148761445.jpg'
-        }
-    };
+        products = await resposta.json();
 
-    // 🟢 Evento para mostrar os detalhes do produto
+        productList.innerHTML = "";
+
+        products.forEach(product => {
+            const div = document.createElement("div");
+            div.classList.add("product-card");
+            div.dataset.id = product.id;
+            div.innerHTML = `
+              <img src="${product.srcImg}" alt="Produto ${product.id}">
+              <h2>${product.name}</h2>
+              <p class="price">${product.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+              <button class="view-details-btn">Ver Detalhes</button>
+            `;
+            productList.appendChild(div);
+        })
+    }
+
+    carregarProdutos();
+
+    // Evento para mostrar os detalhes do produtoa
     productList.addEventListener('click', (event) => {
         if (event.target.classList.contains('view-details-btn')) {
             const card = event.target.closest('.product-card');
-            const productId = card.dataset.productId; // ← ID do produto
-            const product = products[productId];
+            const productId = card.dataset.id;
+            const product = products.find(p => p.id == productId);
 
             // guarda o ID selecionado
             numeroPedido = productId;
@@ -42,8 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Atualiza os detalhes
             document.getElementById('product-title').textContent = product.name;
             document.getElementById('product-description').textContent = product.description;
-            document.getElementById('product-price').textContent = product.price;
-            document.getElementById('product-image').src = product.image;
+            document.getElementById('product-price').textContent =
+                product.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+            document.getElementById('product-image').src = product.srcImg;
 
             // Troca de tela
             productList.classList.add('hidden');
@@ -52,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 🔙 Botão voltar
+    // Botão voltar
     backBtn.addEventListener('click', () => {
         productDetails.classList.add('hidden');
         productList.classList.remove('hidden');
     });
 
-    // 🚀 Botão "Fazer Envio"
+    // Botão "Fazer Envio"
     sendBtn.addEventListener('click', () => {
         if (!numeroPedido) {
             Swal.fire({
