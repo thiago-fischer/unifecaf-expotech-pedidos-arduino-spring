@@ -1,5 +1,6 @@
 package br.com.fecaf.arduino.service;
 
+import br.com.fecaf.arduino.exception.GrafoErrorException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,14 +24,26 @@ public class GrafoService {
     );
 
     public List<String> calcularMenorRota(String origem, String destino) {
-        int start = origem.charAt(0) - 'A';
-        int end = destino.charAt(0) - 'A';
 
-        List<Integer> caminho = dijkstra(start, end);
+        if (origem == null || destino == null ||
+                origem.length() != 1 || destino.length() != 1 ||
+                origem.charAt(0) < 'A' || origem.charAt(0) > 'H' ||
+                destino.charAt(0) < 'A' || destino.charAt(0) > 'H') {
+            throw new GrafoErrorException("Invalid origin or destination. Use letters A through H.");
+        }
 
-        return caminho.stream()
-                .map(i -> String.valueOf((char) ('A' + i)))
-                .toList();
+        try {
+            int start = origem.charAt(0) - 'A';
+            int end = destino.charAt(0) - 'A';
+
+            List<Integer> caminho = dijkstra(start, end);
+
+            return caminho.stream()
+                    .map(i -> String.valueOf((char) ('A' + i)))
+                    .toList();
+        } catch (RuntimeException e) {
+            throw new GrafoErrorException(e.getMessage());
+        }
     }
 
     private List<Integer> dijkstra(int origem, int destino) {
