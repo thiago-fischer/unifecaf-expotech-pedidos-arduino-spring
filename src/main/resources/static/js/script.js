@@ -18,25 +18,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapSvg = document.getElementById('network-map');
 
     const mapNodes = {
-        'A': { x: 50, y: 200 },
-        'B': { x: 150, y: 100 },
-        'C': { x: 150, y: 300 },
-        'D': { x: 300, y: 100 },
-        'E': { x: 300, y: 300 },
-        'F': { x: 450, y: 200 },
-        'G': { x: 550, y: 350 }
+    'A': { x: 30,  y: 262 },
+    'B': { x: 309,  y: 478 },
+    'C': { x: 316,  y: 13 },
+    'D': { x: 651,  y: 253 },
+    'E': { x: 593,  y: 476 },
+    'F': { x: 829,  y: 14 },
+    'G': { x: 306,  y: 252 },
+    'H': { x: 437,  y: 183 },
     };
 
+
     let mapConnections = [
-        { from: 'A', to: 'B', dist: 10 },
-        { from: 'A', to: 'C', dist: 15 },
-        { from: 'B', to: 'D', dist: 20 },
-        { from: 'C', to: 'E', dist: 10 },
-        { from: 'D', to: 'F', dist: 15 },
-        { from: 'E', to: 'F', dist: 10 },
-        { from: 'C', to: 'B', dist: 5 },
-        { from: 'F', to: 'G', dist: 25 }
+    // A
+    { from: 'A', to: 'B', dist: 5 },
+    { from: 'A', to: 'C', dist: 5 },
+    { from: 'A', to: 'G', dist: 3 },
+
+    // B
+    { from: 'B', to: 'E', dist: 6 },
+    { from: 'B', to: 'H', dist: 7 },
+
+    // C
+    { from: 'C', to: 'F', dist: 12 },
+    { from: 'C', to: 'G', dist: 4 },
+
+    // D
+    { from: 'D', to: 'E', dist: 5 },
+    { from: 'D', to: 'F', dist: 6 },
+    { from: 'D', to: 'H', dist: 4 },
+
+    // G
+    { from: 'G', to: 'H', dist: 2 }
     ];
+
+
 
     // ============================================
     // 1. NAVEGAÇÃO (SPA)
@@ -75,15 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     async function carregarProdutos(){
         // MOCK PRODUTOS (Se sua API estiver off, isso mantém a tela bonita)
-        // const resposta = await fetch("http://localhost:8080/produtos");
-        // products = await resposta.json();
+        const resposta = await fetch("http://localhost:8080/produtos");
+        products = await resposta.json();
 
         // Dummy data para teste visual imediato:
-        products = [
-            { id: 1, name: 'Caixa Térmica Pro', price: 150.00, srcImg: 'https://via.placeholder.com/300?text=Caixa', description: 'Ideal para congelados.' },
-            { id: 2, name: 'Pallet Padrão BR', price: 45.90, srcImg: 'https://via.placeholder.com/300?text=Pallet', description: 'Madeira reforçada.' },
-            { id: 3, name: 'Filme Stretch', price: 29.90, srcImg: 'https://via.placeholder.com/300?text=Stretch', description: 'Proteção máxima.' }
-        ];
+//        products = [
+//            { id: 1, name: 'Caixa Térmica Pro', price: 150.00, srcImg: 'https://via.placeholder.com/300?text=Caixa', description: 'Ideal para congelados.' },
+//            { id: 2, name: 'Pallet Padrão BR', price: 45.90, srcImg: 'https://via.placeholder.com/300?text=Pallet', description: 'Madeira reforçada.' },
+//            { id: 3, name: 'Filme Stretch', price: 29.90, srcImg: 'https://via.placeholder.com/300?text=Stretch', description: 'Proteção máxima.' }
+//        ];
 
         productList.innerHTML = "";
         products.forEach(product => {
@@ -125,12 +141,25 @@ document.addEventListener('DOMContentLoaded', () => {
         productList.classList.remove('hidden');
     });
 
-    // BOTÃO FAZER ENVIO (Com Redirecionamento)
+    // BOTÃO FAZER ENVIO (Com requisição REAL e redirecionamento)
     sendBtn.addEventListener('click', () => {
-        if (!numeroPedido) return;
+        if (!numeroPedido) {
+            Swal.fire({
+                title: 'Atenção!',
+                text: 'Selecione um produto antes de enviar o pedido.',
+                icon: 'warning',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
 
-        // Simula Fetch do Pedido
-        new Promise((resolve) => setTimeout(() => resolve("12345"), 500)) // Mock delay
+        fetch(`http://localhost:8080/pedido/${numeroPedido}`, {
+            method: 'GET'
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            return response.text();
+        })
         .then(numeroRetornado => {
             Swal.fire({
                 title: 'Sucesso!',
@@ -140,9 +169,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmButtonColor: '#3498DB'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // REDIRECIONA PARA A TELA DE ROTAS
-                    navigateTo('route-section');
+                    navigateTo('route-section'); // Redireciona igual ao mock
                 }
+            });
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            Swal.fire({
+                title: 'Erro!',
+                text: 'Não foi possível processar o pedido.',
+                icon: 'error',
+                confirmButtonText: 'Ok',
+                confirmButtonColor: '#E74C3C'
             });
         });
     });
@@ -230,47 +268,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const origin = originInput.value;
         const dest = destInput.value;
 
-        if(origin === dest) {
+        if (origin === dest) {
             Swal.fire('Erro', 'Origem e destino devem ser diferentes', 'error');
             return;
         }
 
-        // Simula chamada API de rota
-        // fetch(`http://api/route?from=${origin}&to=${dest}`)...
+        // Chamada REAL à API
+        fetch(`http://localhost:8080/rotas/analise/${origin}/${dest}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
 
-        // LOGICA MOCKADA: Gera uma rota aleatória válida para demonstração
-        // Na vida real, a API retornaria o array ["A", "B", "D", "F"]
+                // Exemplo do JSON esperado:
+                // {
+                //   "caminho": ["A","G","H"],
+                //   "pesoTotalCaminho": 5,
+                //   ...
+                // }
 
-        // Vamos forçar um resultado visual interessante
-        let mockPath = [];
-        let mockDist = 0;
-        let mockWeight = 0;
+                const path = data.caminho;                // ["A","G","H"]
+                const dist = data.pesoTotalCaminho;       // 5
+                const weight = data.pesoTotalGrafo;       // 118 (ou outro que queira exibir)
 
-        // Simulação básica para A -> F
-        if(origin === 'A' && dest === 'F') {
-            mockPath = ['A', 'B', 'D', 'F'];
-            mockDist = 45;
-            mockWeight = 120;
-        } else if (origin === 'A' && dest === 'E') {
-             mockPath = ['A', 'C', 'E'];
-             mockDist = 25;
-             mockWeight = 80;
-        } else {
-            // Fallback: Rota direta simples visual
-            mockPath = [origin, dest];
-            mockDist = Math.floor(Math.random() * 100);
-            mockWeight = Math.floor(Math.random() * 500);
-        }
+                // Atualiza Interface
+                document.getElementById('route-stats').classList.remove('hidden');
+                document.getElementById('stat-distance').textContent = `${dist} km`;
+                document.getElementById('stat-weight').textContent = `${weight} kg`;
+                document.getElementById('stat-path').textContent = path.join(' ➝ ');
 
-        // Atualiza Interface
-        document.getElementById('route-stats').classList.remove('hidden');
-        document.getElementById('stat-distance').textContent = `${mockDist} km`;
-        document.getElementById('stat-weight').textContent = `${mockWeight} kg`;
-        document.getElementById('stat-path').textContent = mockPath.join(' ➝ ');
+                // Desenha caminho no mapa
+                renderMap(path);
 
-        // Redesenha mapa com a rota
-        renderMap(mockPath);
+                Swal.fire({
+                    title: 'Rota pronta!',
+                    text: `Melhor caminho calculado de ${origin} até ${dest}.`,
+                    icon: 'success',
+                    confirmButtonColor: '#3498DB'
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire('Erro', 'Não foi possível calcular a rota.', 'error');
+            });
     });
+
+
 
     // ============================================
     // 4. ADMIN (GERENCIAR ROTAS)

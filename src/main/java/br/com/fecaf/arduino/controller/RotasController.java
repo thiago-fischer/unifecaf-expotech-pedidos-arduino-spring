@@ -1,5 +1,6 @@
 package br.com.fecaf.arduino.controller;
 
+import br.com.fecaf.arduino.model.AnaliseRota;
 import br.com.fecaf.arduino.service.GrafoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,5 +22,11 @@ public class RotasController {
     public List<String> menorRota(@PathVariable String origem,
                                   @PathVariable String destino) {
         return service.calcularMenorRota(origem, destino);
+    }
+
+    @GetMapping("/analise/{origem}/{destino}")
+    public AnaliseRota analiseRota(@PathVariable String origem,
+                                   @PathVariable String destino) {
+        return service.analisar(origem, destino);
     }
 }

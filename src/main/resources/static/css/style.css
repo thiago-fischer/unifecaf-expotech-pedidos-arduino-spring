@@ -135,7 +135,13 @@ body {
 }
 #product-image { max-width: 400px; width: 100%; border-radius: 8px; }
 #product-price { font-size: 2rem; color: var(--accent-color); font-weight: 600; margin: 1rem 0; }
+
+.view-details-btn,
+#send-btn,
 #back-btn { width: 100%; padding: 10px; background: #ccc; border: none; border-radius: 6px; cursor: pointer; }
+
+.view-details-btn,
+#send-btn {background-color: #3498DB; margin-bottom: 1rem; color: #fff;}
 
 .route-layout {
     display: grid;

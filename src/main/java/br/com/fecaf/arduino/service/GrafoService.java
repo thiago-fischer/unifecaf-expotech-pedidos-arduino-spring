@@ -1,6 +1,7 @@
 package br.com.fecaf.arduino.service;
 
 import br.com.fecaf.arduino.exception.GrafoErrorException;
+import br.com.fecaf.arduino.model.AnaliseRota;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -92,5 +93,126 @@ public class GrafoService {
         Collections.reverse(caminho);
         return caminho;
     }
+
+    public AnaliseRota analisar(String origem, String destino) {
+
+        int start = origem.charAt(0) - 'A';
+        int end = destino.charAt(0) - 'A';
+
+        // --- 1. Dijkstra ---
+        List<Integer> caminhoIdx = dijkstra(start, end);
+
+        List<String> caminho = caminhoIdx.stream()
+                .map(i -> String.valueOf((char) ('A' + i)))
+                .toList();
+
+        // --- 2. Métricas do menor caminho ---
+        int pesoTotalCaminho = 0;
+        int menorPesoAresta = Integer.MAX_VALUE;
+        int maiorPesoAresta = Integer.MIN_VALUE;
+
+        for (int i = 0; i < caminhoIdx.size() - 1; i++) {
+            int u = caminhoIdx.get(i);
+            int v = caminhoIdx.get(i + 1);
+            int peso = rotas.get(u).get(v);
+
+            pesoTotalCaminho += peso;
+            menorPesoAresta = Math.min(menorPesoAresta, peso);
+            maiorPesoAresta = Math.max(maiorPesoAresta, peso);
+        }
+
+        int etapas = caminhoIdx.size();
+
+        // --- 3. CÁLCULO: TODAS AS ROTAS ENTRE ORIGEM → DESTINO -----
+        List<List<Integer>> todasRotas = new ArrayList<>();
+        boolean[] visitado = new boolean[rotas.size()];
+
+        dfs(start, end, visitado, new ArrayList<>(), todasRotas);
+
+        int totalRotasPossiveis = todasRotas.size();
+
+        Integer menorRota = null;
+        Integer maiorRota = null;
+
+        for (List<Integer> r : todasRotas) {
+            int peso = calcularPeso(r);
+
+            if (menorRota == null || peso < menorRota)
+                menorRota = peso;
+
+            if (maiorRota == null || peso > maiorRota)
+                maiorRota = peso;
+        }
+
+        Integer diferenca = (menorRota != null && maiorRota != null)
+                ? (maiorRota - menorRota)
+                : null;
+
+
+        // --- 4. Métricas globais do grafo ---
+        int totalRotas = 0;
+        int pesoTotalGrafo = 0;
+        int menorRotaExistente = Integer.MAX_VALUE;
+        int maiorRotaExistente = Integer.MIN_VALUE;
+
+        for (int i = 0; i < rotas.size(); i++) {
+            for (int j = 0; j < rotas.get(i).size(); j++) {
+                int peso = rotas.get(i).get(j);
+
+                if (peso > 0) {
+                    totalRotas++;
+                    pesoTotalGrafo += peso;
+
+                    menorRotaExistente = Math.min(menorRotaExistente, peso);
+                    maiorRotaExistente = Math.max(maiorRotaExistente, peso);
+                }
+            }
+        }
+
+        return new AnaliseRota(
+                caminho,
+                pesoTotalCaminho,
+                menorPesoAresta,
+                maiorPesoAresta,
+                etapas,
+                totalRotas,
+                pesoTotalGrafo,
+                menorRotaExistente,
+                maiorRotaExistente,
+                totalRotasPossiveis,
+                menorRota,
+                maiorRota,
+                diferenca
+        );
+    }
+
+    private void dfs(int atual, int destino, boolean[] visitado, List<Integer> caminho, List<List<Integer>> resultado) {
+        visitado[atual] = true;
+        caminho.add(atual);
+
+        if (atual == destino) {
+            resultado.add(new ArrayList<>(caminho));
+        } else {
+            for (int i = 0; i < rotas.size(); i++) {
+                if (rotas.get(atual).get(i) > 0 && !visitado[i]) {
+                    dfs(i, destino, visitado, caminho, resultado);
+                }
+            }
+        }
+
+        caminho.remove(caminho.size() - 1);
+        visitado[atual] = false;
+    }
+
+    private int calcularPeso(List<Integer> rota) {
+        int peso = 0;
+        for (int i = 0; i < rota.size() - 1; i++) {
+            peso += rotas.get(rota.get(i)).get(rota.get(i + 1));
+        }
+        return peso;
+    }
+
+
+
 }
 
