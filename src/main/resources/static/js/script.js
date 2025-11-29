@@ -17,16 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const calcBtn = document.getElementById('calc-route-btn');
     const mapSvg = document.getElementById('network-map');
 
-    const mapNodes = {
-    'A': { x: 30,  y: 262 },
-    'B': { x: 309,  y: 478 },
-    'C': { x: 316,  y: 13 },
-    'D': { x: 651,  y: 253 },
-    'E': { x: 593,  y: 476 },
-    'F': { x: 829,  y: 14 },
-    'G': { x: 306,  y: 252 },
-    'H': { x: 437,  y: 183 },
-    };
+   const mapNodes = {
+     'A': { x: 21,  y: 183 },
+     'B': { x: 216, y: 335 },
+     'C': { x: 221, y: 20 },
+     'D': { x: 456, y: 177 },
+     'E': { x: 415, y: 333 },
+     'F': { x: 580, y: 20 },
+     'G': { x: 214, y: 176 },
+     'H': { x: 306, y: 128 },
+   };
 
 
     let mapConnections = [
